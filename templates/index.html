@@ -1,0 +1,116 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Index
+{% endblock %}
+
+{% block main %}
+
+    <h1>Cat Focus Timer</h1>
+
+    <p>Meow!</p>
+
+    <div class="container">
+        <canvas id="myCanvas"></canvas>
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0 text-center">Countdown Timer</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h3 id="hours" class="display-4">00</h3>
+                                <p>Hours</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 id="minutes" class="display-4">00</h3>
+                                <p>Minutes</p>
+                            </div>
+                            <div class="col-4">
+                                <h3 id="seconds" class="display-4">00</h3>
+                                <p>Seconds</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                <button class="btn btn-primary" id="time_more" onclick="more_time()">Up</button>
+                <button class="btn btn-primary" id="time_less" onclick="less_time()">Dn</button>
+                <button class="btn btn-primary" id="start" onclick="countdown()">Start</button>
+                <button class="btn btn-primary" id="reset" onclick="reset()">Reset</button>
+            </div>
+        </div>
+        <p id="timer_length"></p>
+    </div>
+
+    <script>
+
+        // Countdown length
+        let timer_length = 0;
+        const timer_display = document.getElementById("timer_length");
+
+        function more_time() {
+            timer_length += 5 * 60 * 1000;  // Add 5 minutes for each click
+            if (timer_length > 120 * 60 * 1000) {
+                timer_length = 120 * 60 * 1000; // Max of 2 hours
+            }
+            updateDisplay(timer_length);
+        }
+
+        function less_time() {
+            timer_length -= 5 * 60 * 1000; // Subtract 5 minutes for each click
+            if (timer_length < 0) {
+                timer_length = 0; // Min of 0 minutes
+            }
+            updateDisplay(timer_length);
+        }
+
+        function countdown() {
+            const countDownTime = new Date().getTime() + timer_length;
+
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+
+                const distance = countDownTime - now;
+
+                updateDisplay(distance);
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("hours").innerHTML = "00";
+                    document.getElementById("minutes").innerHTML = "00";
+                    document.getElementById("seconds").innerHTML = "00";
+                }
+            }, 1000);
+        }
+    
+        function reset() {
+            timer_length = 0;
+            updateDisplay(timer_length);
+        }
+
+        function updateDisplay(length_in_milliseconds) {
+            const hours = Math.floor((length_in_milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((length_in_milliseconds % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((length_in_milliseconds % (1000 * 60)) / 1000);
+
+            document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+        }
+
+        // Draw on canvas
+        const canvas = document.getElementById("myCanvas");
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = "gray";
+        context.lineWidth = 2;
+        context.strokeRect(1, 1, canvas.width-2, canvas.height-2);
+
+    </script>
+        
+{% endblock %}

@@ -13,4 +13,4 @@ You can also sell the baked goods to buy things for the kitchen.
 - Min: 5, Max: 60
 2. Focus
 - JS: document.visibilityState, visibilitychange event
-
+3. Test here

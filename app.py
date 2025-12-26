@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 from flask import Flask, render_template, request, flash, get_flashed_messages
 from flask_session import Session
 from helpers import SHOP_ITEMS

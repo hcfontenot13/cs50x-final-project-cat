@@ -6,110 +6,865 @@
 
 {% block main %}
 
-    <h1>Cat Focus Timer</h1>
+    <h1 id="page_title">Cat Focus Timer</h1>
 
-    <p>Meow!</p>
+    <!-- Header materials (cookie count & info button) -->
+    <div class="container fixed-container-top-left" style="text-align: left;">
+        <h6 id="cookie_count">&#127850;</h6>
+    </div>
+    <button class="btn btn-info fixed-button-top-right" type="button" id="infoButton" data-bs-toggle="modal" data-bs-target="#infoModal">i</button>
 
-    <div class="container">
-        <canvas id="myCanvas"></canvas>
+    <!-- Test button: Break Modal -->
+    <!-- <button class="btn btn-secondary" id="testButton" data-bs-toggle="modal" data-bs-target="#breakTimeModal">Break</button> -->
+    
+    <!-- Shop button -->
+    <button class="btn btn-info fixed-button-bottom-left" id="shopButton" data-bs-toggle="modal" data-bs-target="#shopModal">Shop</button>
+
+    <!-- Cat image -->
+    <div class="container-img">
+        <img id="myImage" src="/static/images/cat/cat_standing_1.png" width="300" height="513">
+    </div>
+
+    <!-- Countdown timer -->
+    <div class="container fixed-container">
         <div class="row justify-content-center">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header bg-primary text-white">
-                        <h4 class="mb-0 text-center">Countdown Timer</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <h3 id="hours" class="display-4">00</h3>
-                                <p>Hours</p>
-                            </div>
-                            <div class="col-4">
-                                <h3 id="minutes" class="display-4">00</h3>
-                                <p>Minutes</p>
-                            </div>
-                            <div class="col-4">
-                                <h3 id="seconds" class="display-4">00</h3>
-                                <p>Seconds</p>
-                            </div>
-                        </div>
+            <div class="col-md-3 col-6">
+                <div class="card text-center bg-light" style="--bs-bg-opacity: .6;">
+                    <div class="card-body p-1">
+                        <h6 id="time_remaining" class="display-6">00:05:00</h6>
+                        <input type="range" class="form-range" id="timer_range" min="5" max="120" step="5" value="5">
+                        <button class="btn btn-primary" id="countdown_button" type="button" onclick="startCountdown()">Start</button>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="col-md-3">
-                <button class="btn btn-primary" id="time_more" onclick="more_time()">Up</button>
-                <button class="btn btn-primary" id="time_less" onclick="less_time()">Dn</button>
-                <button class="btn btn-primary" id="start" onclick="countdown()">Start</button>
-                <button class="btn btn-primary" id="reset" onclick="reset()">Reset</button>
-            </div>
-        </div>
-        <p id="timer_length"></p>
     </div>
 
+    <!-- Modal: Info -->
+    <div class="modal fade" id="infoModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Meow It Works</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Welcome to KattyKakes Bakery!</p>
+                    <p>Muffin, your friendly neighborhood baker, is here to help you focus. 
+                       Just set a timer and start your focus session! 
+                       While you get your stuff done, Muffin will bake cookies. The longer the session, the more cookies Muffin will bake!</p>
+                    <p>After each focus session, you can set a 5-minute break timer and play a short game with Muffin.</p>
+                    <p>If you leave the tab or minimize the browser window, Muffin will go to sleep until you get back.</p>
+                    <p>You can exchange the cookies Muffin bakes for fun decorations for the bakery! Check out the Shop to see what's available.</p>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <p><small class="text-muted">This app was made by me, hcfontenot13, for <a href="https://cs50.harvard.edu/">CS50</a>.</small></p><button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Confirm timer cancellation -->
+    <div class="modal fade" id="endSessionModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Cancel Session</h1>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to end this focus session early?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="keep_focusing_button" type="button" data-bs-dismiss="modal">Keep Focusing!</button>
+                    <button class="btn btn-danger reset-during-timer" id="stop_focusing_button" type="button" data-bs-dismiss="modal">End Session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Focus session complete -->
+    <div class="modal fade" id="timerCompleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Session Complete!</h1>
+                </div>
+                <div class="modal-body">
+                    <p>Great job! You completed a focus session! Muffin baked these:</p>
+                    <img id="cookieImage" src="/static/cookie1.jpg" width="200" height="200">
+                    <p id="bakedGoods">Cookies</p>
+                    <p>Take a short break?</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" id="start_break_button" type="button" data-bs-toggle="modal" data-bs-target="#breakTimeModal">Take five</button>
+                    <button class="btn btn-danger reset-after-timer" id="skip_break_button" type="button" data-bs-dismiss="modal">No thanks</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal: Break session -->
+    <div class="modal fade" id="breakTimeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="breakTimeModalHeader">Break time!</h1>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Let's play Tic-Tac-Toe!
+                        Choose X or O:
+                        <button type="button" class="btn btn-warning border border-3" id="chooseX">X</button>
+                        <button type="button" class="btn btn-warning" id="chooseO">O</button>
+                    </p>
+                    <p id="gameInstructions"></p>
+                    <canvas width="300" height="300" id="game"></canvas>
+                    <p id="gameResult"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" id="reset_game_button" type="button" onclick="initializeGame()">Play again</button>
+                    <button class="btn btn-danger reset-during-timer" id="cancel_break_button" type="button" data-bs-dismiss="modal">End break early</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Break session complete -->
+    <div class="modal fade" id="breakCompleteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Break complete!</h1>
+                </div>
+                <div class="modal-body">
+                    Ready to start another focus session?
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary reset-after-timer" id="break_over_button" type="button" data-bs-dismiss="modal">Let's go!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Sleeping cat -->
+    <div class="modal fade" id="sleepModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Focus session interrupted</h1>
+                </div>
+                <div class="modal-body">
+                    <img id="sleepImage" src="/static/cat_sleeping_1.png" width="410" height="240">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary reset-after-timer" id="restart_focus_session_button" type="button" data-bs-dismiss="modal">Jump back in!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Shop -->
+    <div class="modal fade" id="shopModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Shop</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row row-cols-3 row-cols-md-6 g-4">
+                        {% for item in SHOP_ITEMS %}
+                            <div class="col">
+                                <div class="card">
+                                    <img src="{{ item.src }}" class="card-img-top">
+                                    <div class="card-body">
+                                        <h6 class="card-title">{{ item.display }}</h6>
+                                        <button type="button" id="buy-{{ item.name }}" class="btn btn-primary buy-btn">&#127850;x{{ item.cost }}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <p id="shop_cookie_count">&#127850; XX</p>
+                    <button class="btn btn-primary reset-after-timer" id="close_shop_button" type="button" data-bs-dismiss="modal">Leave shop</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script>
 
-        // Countdown length
-        let timer_length = 0;
-        const timer_display = document.getElementById("timer_length");
+        // Get all decor items from Jinja
+        const allDecorItems = {{ SHOP_ITEMS | tojson }};
+        
+        // Total cookies
+        let totalCookies = fetchCookie("total_cookies");
+        const cookieCounter = document.getElementById("cookie_count");
+        cookieCounter.innerHTML = `&#127850; ${totalCookies}`;
 
-        function more_time() {
-            timer_length += 5 * 60 * 1000;  // Add 5 minutes for each click
-            if (timer_length > 120 * 60 * 1000) {
-                timer_length = 120 * 60 * 1000; // Max of 2 hours
+        let bakeryDecor = fetchCookie("bakery_decor");
+
+        document.addEventListener('DOMContentLoaded', loadBackgroundImages);
+
+        // Load background images
+        function loadBackgroundImages() {
+            bakeryDecor = getCookie("bakery_decor").split(','); 
+            let backgroundImages = "url('static/images/background/kitchen_bg.png')";
+
+            // Check if any "bottom" interactions are present
+            const bottomLayerDecor = ["curtains", "books", "yellow_jar"];
+            for (const item in bottomLayerDecor) {
+                if (bakeryDecor.includes(bottomLayerDecor[item])) {
+                    backgroundImages = `url("/static/images/decor/${bottomLayerDecor[item]}/${bottomLayerDecor[item]}_bg.png"), ` + backgroundImages;
+                }
             }
-            updateDisplay(timer_length);
+
+            bakeryDecor.forEach(decor => {
+                if (decor && !bottomLayerDecor.includes(decor)) {
+                    const decorItem = allDecorItems.find((obj) => obj.name === decor);
+                    if (decorItem.overlap) {
+                        const overlapItem = decorItem.overlap;
+                        if (bakeryDecor.includes(overlapItem)) {
+                            backgroundImages = `url("/static/images/decor/${decorItem.name}/${decorItem.name}_${overlapItem}_bg.png"), ` + backgroundImages;
+                        } else {
+                            backgroundImages = `url("/static/images/decor/${decorItem.name}/${decorItem.name}_bg.png"), ` + backgroundImages;
+                        }
+                    } else {
+                        backgroundImages = `url("/static/images/decor/${decorItem.name}/${decorItem.name}_bg.png"), ` + backgroundImages;
+                    }
+                }
+            }); 
+
+            // Replace background images
+            document.body.style.backgroundImage = backgroundImages;
         }
 
-        function less_time() {
-            timer_length -= 5 * 60 * 1000; // Subtract 5 minutes for each click
-            if (timer_length < 0) {
-                timer_length = 0; // Min of 0 minutes
-            }
-            updateDisplay(timer_length);
+        // Set browser cookie
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
         }
 
-        function countdown() {
-            const countDownTime = new Date().getTime() + timer_length;
+        // Get browser cookie
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
 
+        // Fetch cookie value
+        function fetchCookie(cname) {
+            if (cname == "total_cookies") {
+                return ~~getCookie(cname);
+            } else if (cname == "bakery_decor") {
+                return getCookie(cname).split(',');
+            }
+        }
+
+        // Update user's total cookies
+        function updateCookies(n) {
+            totalCookies += n;
+            cookieCounter.innerHTML = `&#127850; ${totalCookies}`;
+            setCookie("total_cookies", totalCookies, 365);
+        }
+
+        // Session length selection slider
+        var slider = document.getElementById("timer_range");
+        slider.oninput = function() {
+            timer_length = this.value * 60 * 1000;
+            updateDisplay(timer_length);
+        };
+
+        // Countdown defaults
+        let timer_length = 5 * 60 * 1000; // default is 1 min for debugging purposes
+        let timer_mode = "focus";
+        
+        // Countdown button
+        const countdownButton = document.getElementById("countdown_button");
+
+        // Countdown
+        function startCountdown() {
+            // Hide slider
+            slider.hidden = true;
+
+            // Change cat animation to mixing
+            clearInterval(bgImg);
+            const mixingFrame1 = '/static/images/cat/cat_mixing_1.png';
+            const mixingFrame2 = '/static/images/cat/cat_mixing_2.png';
+            bgImg = alternateImages(catImage, mixingFrame1, mixingFrame2);
+
+            // Calculate countdown time
+            const countDownTime = new Date().getTime() + timer_length + 500; // Add half a second so countdown doesn't skip first second
+
+            // Update countdown button
+            if (timer_mode == "focus") {
+                // Update to "Cancel" functionality
+                updateCountdownButton("cancel_timer");
+            } else {
+                // Update to "Break" functionality
+                updateCountdownButton("break_timer");
+            }
+
+            // Disable shop & info buttons
+            document.getElementById("shopButton").disabled = true;
+            document.getElementById("infoButton").disabled = true;
+
+            function clickAway() {
+                if (document.visibilityState == "hidden") {
+                    clearInterval(x);
+                    slider.hidden = false;
+                    updateDisplay(timer_length);
+                    updateCountdownButton("start_timer");
+
+                    // Reset cat animation to idle
+                    clearInterval(bgImg);
+                    bgImg = alternateImages(catImage, standingFrame1, standingFrame2);
+
+                    // Open sleep modal
+                    const sleepModal = document.getElementById("sleepModal");
+                    const myModal = new bootstrap.Modal(sleepModal);
+                    myModal.show();
+
+                    document.removeEventListener("visibilitychange", clickAway);
+                }
+            }
+
+            // Add click-away listener
+            if (timer_mode == "focus") {
+                document.addEventListener("visibilitychange", clickAway);
+            }
+
+            // Update timer every second
             const x = setInterval(function() {
-                const now = new Date().getTime();
 
+                // Calculate remaining time & update display
+                const now = new Date().getTime();
                 const distance = countDownTime - now;
 
                 updateDisplay(distance);
+                
+                // When countdown reaches zero
                 if (distance < 0) {
                     clearInterval(x);
-                    document.getElementById("hours").innerHTML = "00";
-                    document.getElementById("minutes").innerHTML = "00";
-                    document.getElementById("seconds").innerHTML = "00";
+                    slider.hidden = false;
+                    updateDisplay(0);
+                    updateCountdownButton("timer_complete");
+
+                    // Change cat animation to idle
+                    clearInterval(bgImg);
+                    bgImg = alternateImages(catImage, standingFrame1, standingFrame2);
+
+                    // Close all modals
+                    document.querySelectorAll(".modal").forEach(function(modalElem) {
+                        const myModal = bootstrap.Modal.getOrCreateInstance(modalElem);
+                        myModal.hide();
+                    });
+
+                    if (timer_mode == "focus") {
+                        // Remove click-away listener
+                        document.removeEventListener("visibilitychange", clickAway);
+                        // Open session over modal
+                        const timerCompleteModal = document.getElementById("timerCompleteModal");
+                        const myModal = new bootstrap.Modal(timerCompleteModal);
+                        myModal.show();
+                        // Show # of cookies baked
+                        const cookiesBaked = timer_length / 60 / 1000 <= 15 ? 3 :
+                                             timer_length / 60 / 1000 <= 30 ? 6 :
+                                             timer_length / 60 / 1000 <= 45 ? 9 :
+                                             timer_length / 60 / 1000 <= 60 ? 12 :
+                                             timer_length / 60 / 1000 <= 75 ? 15 :
+                                             timer_length / 60 / 1000 <= 90 ? 18 : 
+                                             timer_length / 60 / 1000 <= 105 ? 21 : 24;
+                        document.getElementById("bakedGoods").innerHTML = `Cookies x${cookiesBaked}`;
+                        updateCookies(cookiesBaked);
+                        // Display image matching cookies baked
+                        const cookieImage = document.getElementById("cookieImage");
+                        cookieImage.src = `static/images/cookie/cookie${cookiesBaked/3}.png`;
+                        // Enable shop & info buttons
+                        document.getElementById("shopButton").disabled = false;
+                        document.getElementById("infoButton").disabled = false;
+                    } else {
+                        // Open breaktime over modal
+                        const breakCompleteModal = document.getElementById("breakCompleteModal");
+                        const myModal = new bootstrap.Modal(breakCompleteModal);
+                        myModal.show();
+                    }
                 }
+
             }, 1000);
+
+            // Onclick function for cancel timer buttons
+            const resetTimerButtons = document.querySelectorAll(".reset-during-timer");
+            resetTimerButtons.forEach(btn => {
+                btn.onclick = function() {
+                    clearInterval(x);
+                    slider.hidden = false;
+                    // Reset timer length and mode
+                    timer_length = slider.value * 60 * 1000;
+                    timer_mode = "focus";
+                    updateDisplay(timer_length);
+                    updateCountdownButton("start_timer");
+                    // Reset cat animation to idle
+                    clearInterval(bgImg);
+                    bgImg = alternateImages(catImage, standingFrame1, standingFrame2);
+                    // Enable shop & info buttons
+                    document.getElementById("shopButton").disabled = false;
+                    document.getElementById("infoButton").disabled = false;
+                }
+            });
+
         }
     
-        function reset() {
-            timer_length = 0;
-            updateDisplay(timer_length);
-        }
+        // Onclick function for break time button
+        const breakTimeButton = document.getElementById("start_break_button");
+        breakTimeButton.onclick = function() {
+            // Set 5 minute timer
+            timer_length = 5 * 60 * 1000;
+            timer_mode = "break";
+            startCountdown();
 
+            // Display countdown in modal header
+            const countDownTime = new Date().getTime() + timer_length;
+            const breaktimeHeader = document.getElementById("breakTimeModalHeader");
+            const x = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = countDownTime - now;
+                const mainTimer = document.getElementById("time_remaining");
+                breaktimeHeader.innerHTML = `Break time! ${mainTimer.innerHTML} remaining.`;
+                if (distance < 0) {
+                    clearInterval(x);
+                }
+            }, 500);
+        };
+
+        // Onclick function for reset timer buttons
+        const resetButtons = document.querySelectorAll(".reset-after-timer");
+        resetButtons.forEach(btn => {
+            btn.onclick = function() {
+                // Reset timer length and mode
+                timer_length = slider.value * 60 * 1000;;
+                timer_mode = "focus";
+                updateDisplay(timer_length);
+                updateCountdownButton("start_timer");
+                // Enable shop & info buttons
+                document.getElementById("shopButton").disabled = false;
+                document.getElementById("infoButton").disabled = false;
+            };
+        });
+
+        // Update timer display
         function updateDisplay(length_in_milliseconds) {
             const hours = Math.floor((length_in_milliseconds % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((length_in_milliseconds % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((length_in_milliseconds % (1000 * 60)) / 1000);
 
-            document.getElementById("hours").innerHTML = hours.toString().padStart(2, '0');
-            document.getElementById("minutes").innerHTML = minutes.toString().padStart(2, '0');
-            document.getElementById("seconds").innerHTML = seconds.toString().padStart(2, '0');
+            document.getElementById("time_remaining").innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
-        // Draw on canvas
-        const canvas = document.getElementById("myCanvas");
-        const context = canvas.getContext('2d');
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.strokeStyle = "gray";
-        context.lineWidth = 2;
-        context.strokeRect(1, 1, canvas.width-2, canvas.height-2);
+        // Update countdown button mode
+        function updateCountdownButton(button_mode) {
+            if (button_mode == "start_timer") {
+                // Start timer
+                countdownButton.innerHTML = "Start";
+                countdownButton.classList = "";
+                countdownButton.classList.add("btn", "btn-primary");
+                countdownButton.removeAttribute("data-bs-toggle");
+                countdownButton.removeAttribute("data-bs-target");
+                countdownButton.onclick = startCountdown;
+            } else if (button_mode == "cancel_timer") {
+                // Cancel timer
+                countdownButton.innerHTML = "Cancel";
+                countdownButton.classList = "";
+                countdownButton.classList.add("btn", "btn-danger");
+                countdownButton.setAttribute("data-bs-toggle", "modal");
+                countdownButton.setAttribute("data-bs-target", "#endSessionModal");
+                countdownButton.onclick = null;
+            } else if (button_mode == "timer_complete") {
+                // Timer reaches zero
+                countdownButton.innerHTML = "Finished!";
+                countdownButton.classList = "";
+                countdownButton.classList.add("btn", "btn-success");
+                countdownButton.onclick = null;
+            } else if (button_mode == "break_timer") {
+                // Break time
+                countdownButton.innerHTML = "Break time!";
+                countdownButton.classList = "";
+                countdownButton.classList.add("btn", "btn-warning");
+                countdownButton.onclick = null;
+            }
+        }
+
+        // Swap two images
+        function alternateImages(imageElement, src1, src2) {
+            let isFrameOne = true;
+            const imgInterval = setInterval(() => {
+                if (isFrameOne) {
+                    imageElement.src = src1;
+                } else {
+                    imageElement.src = src2;
+                }
+                isFrameOne = !isFrameOne;
+            }, 750);
+            return imgInterval;
+        }
+
+        const catImage = document.getElementById("myImage");
+        const standingFrame1 = "/static/images/cat/cat_standing_1.png";
+        const standingFrame2 = "/static/images/cat/cat_standing_2.png";
+
+        let bgImg = alternateImages(catImage, standingFrame1, standingFrame2);
+
+        // Sleep modal: Update cat image to sleeping
+        function sleepingCat() {
+            const sleepingCatImage = document.getElementById("sleepImage");
+            const sleepingFrame1 = "/static/images/cat/cat_sleeping_1.png";
+            const sleepingFrame2 = "/static/images/cat/cat_sleeping_2.png";
+
+            let sleepImg = alternateImages(sleepingCatImage, sleepingFrame1, sleepingFrame2);
+
+            document.getElementById("sleepModal").removeEventListener("show.bs.modal", sleepingCat);
+        }
+
+        const sleepModal = document.getElementById("sleepModal");
+        sleepModal.addEventListener("show.bs.modal", sleepingCat);
+        document.getElementById("restart_focus_session_button").addEventListener("click", function() {
+            document.getElementById("shopButton").disabled = false;
+            document.getElementById("infoButton").disabled = false;
+        });
+
+        // Tic-Tac-Toe
+        const canvas = document.getElementById("game");
+        const context = canvas.getContext("2d");
+        const boardLineWidth = 6;
+        const boardGapWidth = 10;
+        let playerSymbol = null;
+        let autoSymbol = null;
+        let isPlayerTurn = null;
+        let gameOver = true;
+        const chooseXButton = document.getElementById("chooseX");
+        const chooseOButton = document.getElementById("chooseO");
+        const gameInstructions = document.getElementById("gameInstructions");
+        const gameResult = document.getElementById("gameResult");
+        const playAgain = document.getElementById("reset_game_button");
+        let squares = [
+            [false, false, false],
+            [false, false, false],
+            [false, false, false]
+        ];
+
+        // Initialize game when breaktime modal is shown
+        const breakTimeModal = document.getElementById("breakTimeModal");
+        breakTimeModal.addEventListener("show.bs.modal", initializeGame);
+
+        // Draw game board
+        function drawGameBoard() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.lineWidth = boardLineWidth * 2;
+            context.strokeStyle = "lightgrey";
+            context.strokeRect(0, 0, canvas.width, canvas.height);
+            context.lineWidth = boardLineWidth;
+            context.strokeStyle = "black";
+            context.strokeRect(canvas.width / 3, boardGapWidth, 0, canvas.height - 2 * boardGapWidth);
+            context.strokeRect(canvas.width * 2 / 3 , boardGapWidth, 0, canvas.height - 2 * boardGapWidth);
+            context.strokeRect(boardGapWidth, canvas.height / 3, canvas.width - 2 * boardGapWidth, 0);
+            context.strokeRect(boardGapWidth, canvas.height * 2 /3, canvas.width - 2 * boardGapWidth, 0);
+        }
+
+        // Player's choice buttons
+        function xButton() {
+            playerSymbol = "x";
+            autoSymbol = "o";
+            isPlayerTurn = true;
+            gameOver = false;
+            chooseXButton.classList.add("border", "border-3");
+            chooseXButton.onclick = null;
+            chooseOButton.onclick = null;
+            startGame();
+        }
+
+        function oButton() {
+            playerSymbol = "o";
+            autoSymbol = "x";
+            isPlayerTurn = false;
+            gameOver = false;
+            chooseOButton.classList.add("border", "border-3");
+            chooseXButton.onclick = null;
+            chooseOButton.onclick = null;
+            startGame();
+        }
+
+        // Initialize/reset game
+        function initializeGame() {
+            drawGameBoard();
+            playerSymbol = null;
+            autoSymbol = null;
+            isPlayerTurn = null;
+            gameOver = true;
+            chooseXButton.classList = "";
+            chooseXButton.classList.add("btn", "btn-warning");
+            chooseOButton.classList = "";
+            chooseOButton.classList.add("btn", "btn-warning");
+            chooseXButton.onclick = xButton;
+            chooseOButton.onclick = oButton;
+            squares = [
+                [false, false, false],
+                [false, false, false],
+                [false, false, false]
+            ];
+            gameInstructions.innerHTML = "";
+            gameResult.innerHTML = "";
+            playAgain.hidden = true;
+        }
+
+        // Player's turn
+        async function waitForPlayerTurn() {
+            return new Promise((resolve) => {
+                const playerClickHandler = (event) => {
+                    const rect = canvas.getBoundingClientRect();
+                    // Get coordinates
+                    const x = event.clientX - rect.x;
+                    const y = event.clientY - rect.y;
+                    // Check if click landed on game border or black lines
+                    const borderClicked = !(x > boardLineWidth && x < canvas.width - boardLineWidth && y > boardLineWidth && y < canvas.height - boardLineWidth);
+                    const blackLineClicked1 = (x > canvas.width / 3 - boardLineWidth / 2 && x < canvas.width / 3 + boardLineWidth / 2);
+                    const blackLineClicked2 = (x > canvas.width * 2 / 3 - boardLineWidth / 2 && x < canvas.width * 2 / 3 + boardLineWidth / 2);
+                    const blackLineClicked3 = (y > canvas.height / 3 - boardLineWidth / 2 && y < canvas.height / 3 + boardLineWidth / 2);
+                    const blackLineClicked4 = (y > canvas.height * 2 / 3 - boardLineWidth / 2 && y < canvas.height * 2 / 3 + boardLineWidth / 2);
+                    const blackLineClicked = blackLineClicked1 || blackLineClicked2 || blackLineClicked3 || blackLineClicked4;
+
+                    // If a square is clicked
+                    if (!borderClicked && !blackLineClicked) {
+                        // Check which square is clicked
+                        const row = (y < canvas.height / 3) ? 0 :
+                                    (y < canvas.height * 2 / 3) ? 1 : 2;
+                        const col = (x < canvas.width / 3) ? 0 :
+                                    (x < canvas.height * 2 / 3) ? 1: 2;
+                        
+                        // If square is not filled, then fill it
+                        if (!squares[row][col]) {
+                            drawSymbol(row, col, playerSymbol);
+                            squares[row][col] = playerSymbol;
+                            // Finish turn
+                            isPlayerTurn = false;
+                            canvas.removeEventListener("click", playerClickHandler);
+                            resolve(true); 
+                        }
+                    }
+                };
+                // Add event listener
+                canvas.addEventListener("click", playerClickHandler);
+            });
+        }
+
+        // Computer's turn
+        async function waitForComputerTurn() {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return new Promise((resolve) => {
+                let turnComplete = false;
+                while (!turnComplete) {
+                    // Randomly pick a square
+                    const maxNum = 3;
+                    const row = Math.floor(Math.random() * maxNum);
+                    const col = Math.floor(Math.random() * maxNum);
+
+                    // If square is not filled, then fill it
+                    if (!squares[row][col]) {
+                        drawSymbol(row, col, autoSymbol);
+                        squares[row][col] = autoSymbol;
+                        // Finish turn
+                        turnComplete = true;
+                        isPlayerTurn = true;
+                        resolve(true);
+                    }
+                }
+            });
+        }
+
+        // Play one round
+        async function playOneRound() {
+            return new Promise((resolve) => {
+                if (isPlayerTurn) {
+                    waitForPlayerTurn()
+                    .then(turnResult => endGameMet())
+                    .then(gameResult => {
+                        resolve(gameResult);
+                    });
+                } else {
+                    waitForComputerTurn()
+                    .then(turnResult => endGameMet())
+                    .then(gameResult => {
+                        resolve(gameResult);
+                    });
+                }
+            });
+        }
+
+        // Game loop
+        async function startGame() {
+            gameInstructions.innerHTML = "X goes first!";
+            while (!gameOver) {
+                gameOver = await playOneRound();
+            }
+            // Declare winner
+            const msg = gameOver == playerSymbol ? "You Win!" : 
+                        gameOver == autoSymbol ? "Muffin Wins!" : "It's a Draw!";
+            gameResult.innerHTML = msg;
+            // Show "play again" button
+            playAgain.hidden = false;
+        }
+
+        // Draw X or O in grid
+        function drawSymbol(row, col, symbol) {
+            const squareX = col * canvas.width / 3 + 2 * boardLineWidth;
+            const squareY = row * canvas.height / 3 + 2 * boardLineWidth;
+            const squareWidth = canvas.width / 3 - 4 * boardLineWidth;
+            context.strokeStyle = "blue";
+            context.lineWidth = 2;
+            if (symbol == "o") {
+                context.beginPath();
+                context.arc(squareX + squareWidth / 2, squareY + squareWidth / 2, squareWidth / 2, 0, 2 * Math.PI);
+                context.stroke();
+            } else {
+                context.beginPath();
+                context.moveTo(squareX, squareY);
+                context.lineTo(squareX + squareWidth, squareY + squareWidth);
+                context.stroke();
+                context.beginPath();
+                context.moveTo(squareX, squareY + squareWidth);
+                context.lineTo(squareX + squareWidth, squareY);
+                context.stroke();
+            }
+        }
+
+        // Draw red line through 3-in-a-row
+        function drawRedLine(winType, n) {
+            let xStart, yStart, xEnd, yEnd;
+            if (winType == "row") {
+                // ---
+                xStart = 2 * boardLineWidth;
+                yStart = n * canvas.height / 3 + canvas.height / 6;
+                xEnd = canvas.width - 2 * boardLineWidth;
+                yEnd = yStart;
+            } else if (winType == "col") {
+                // |
+                xStart = n * canvas.width / 3 + canvas.width / 6;
+                yStart = 2 * boardLineWidth;
+                xEnd = xStart;
+                yEnd = canvas.height - 2 * boardLineWidth;
+            } else if (winType == "diag1") {
+                // \
+                xStart = 2 * boardLineWidth;
+                yStart = 2 * boardLineWidth;
+                xEnd = canvas.width - 2 * boardLineWidth;
+                yEnd = canvas.height - 2 * boardLineWidth;
+            } else {
+                // /
+                xStart = 2 * boardLineWidth;
+                yStart = canvas.height - 2 * boardLineWidth;
+                xEnd = canvas.width - 2 * boardLineWidth;
+                yEnd = 2 * boardLineWidth;
+            }
+            context.strokeStyle = "red";
+            context.lineWidth = 5;
+            context.beginPath();
+            context.moveTo(xStart, yStart);
+            context.lineTo(xEnd, yEnd);
+            context.stroke();
+        }
+
+        // Check endgame conditions
+        function endGameMet() {
+            // 3-in-a-row
+            for (let i = 0; i < squares.length; i++) {
+                if (squares[i][0] == squares[i][1] && squares[i][1] == squares[i][2] && squares[i][0]) {
+                    drawRedLine("row", i);
+                    return squares[i][0];
+                }
+                if (squares[0][i] == squares[1][i] && squares[1][i] == squares[2][i] && squares[0][i]) {
+                    drawRedLine("col", i);
+                    return squares[0][i];
+                }
+            }
+            if (squares[0][0] == squares[1][1] && squares[1][1] == squares[2][2] && squares[0][0]) {
+                drawRedLine("diag1", 0);
+                return squares[0][0];
+            }
+            if (squares[0][2] == squares[1][1] && squares[1][1] == squares[2][0] && squares[0][2]) {
+                drawRedLine("diag2", 0);
+                return squares[0][2];
+            }
+            // All squares filled
+            if (!squares.flat().some(square => !square)) {
+                return "draw";
+            }
+            return false;
+        }
+
+        // Update shop display
+        const shopButtons = document.querySelectorAll(".buy-btn");
+        const shopCookieCount = document.getElementById("shop_cookie_count");
+
+        function updateShopDisplay() {
+            shopCookieCount.innerHTML = "&#127850; " + totalCookies;
+            shopButtons.forEach(btn => {
+                // Get item name
+                const itemName = btn.id.split("-")[1];
+                // Update button 
+                bakeryDecor = getCookie("bakery_decor").split(',');
+                if (bakeryDecor.includes(itemName)) {
+                    // Item already owned
+                    btn.onclick = null;
+                    btn.classList = "";
+                    btn.classList.add("btn", "btn-secondary", "buy-btn");
+                    btn.innerHTML = "Owned";
+                } else {
+                    // Get item cost
+                    const itemCost = ~~btn.textContent.split("x")[1];
+                    if (totalCookies < itemCost) {
+                        // Not enough funds
+                        btn.onclick = null;
+                        btn.classList = "";
+                        btn.classList.add("btn", "btn-danger", "buy-btn");
+                    } else {
+                        // Item available to purchase
+                        btn.classList = "";
+                        btn.classList.add("btn", "btn-primary", "buy-btn");
+                        btn.onclick = function() {
+                            updateCookies(-1 * itemCost);
+                            setCookie("bakery_decor", getCookie("bakery_decor") + "," + itemName, 365);
+                            // Update all buttons after purchase
+                            updateShopDisplay();
+                        }
+                    }
+                }
+            });
+        }
+
+        const shopModal = document.getElementById("shopModal");
+        shopModal.addEventListener("show.bs.modal", updateShopDisplay);
+
+        // Reload page when shop window is closed
+        function reloadImages() {
+            closeShopButton.removeEventListener('click', reloadImages);
+            location.reload();
+        }
+        const closeShopButton = document.getElementById("close_shop_button");
+        closeShopButton.addEventListener('click', reloadImages);
 
     </script>
         

@@ -1,0 +1,49 @@
+.fixed-container-top-left {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.fixed-container {
+    position: fixed;
+    bottom:20px;
+    left: 50%;
+    transform: translate(-50%, 0%);
+    /* padding: 0px 10px; */
+    /* border-radius: 5px; */
+    /* font-size: 1.5rem; */
+    z-index: 1000;
+    /* color: white; */
+}
+
+.fixed-button-top-right {
+    position: fixed;
+    top: 15px;
+    right: 20px;
+    padding: 0px 10px;
+    border-radius: 15px;
+    font-size: 1.5rem;
+    z-index: 1000;
+    color: white;
+}
+
+.fixed-button-bottom-left {
+    position: fixed;
+    bottom: 15px;
+    left: 20px;
+    padding: 0px 10px;
+    border-radius: 15px;
+    font-size: 1.5rem;
+    z-index: 1000;
+    color: white;
+}
+
+.container-img {
+    position: relative;
+}
+
+.image2 {
+    position: absolute;
+    left: 50px;
+}

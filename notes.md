@@ -32,7 +32,7 @@ You can also sell the baked goods to buy things for the kitchen.
 ## TODO
 - [x] Add to info modal (acknowledge CS50)
 - [x] Replace debugging defaults w/ production values (focus length, break length, decor prices)
-- [ ] Host the app
+- [x] Host the app
 - [ ] Make video 
 - [ ] Write ReadMe
 - [ ] Submit

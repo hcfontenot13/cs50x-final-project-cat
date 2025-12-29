@@ -28,6 +28,7 @@ You can also sell the baked goods to buy things for the kitchen.
 - [x] How to display different decorations?
 - [ ] About page?
 - [ ] Buy and pick kitchen color schemes?
+- [ ] Change # of cookies to timer length / 5 (need to also update cookie images)
 
 ## TODO
 - [x] Add to info modal (acknowledge CS50)

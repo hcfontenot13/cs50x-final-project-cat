@@ -5,7 +5,7 @@
 
 {% block main %}
 
-    <h1 id="page_title">Cat Focus Timer</h1>
+    <h1 id="page_title">KattyKakes Focus Timer</h1>
 
     <!-- Header materials (cookie count & info button) -->
     <div class="container fixed-container-top-left" style="text-align: left;">
@@ -389,6 +389,7 @@
                                              timer_length / 60 / 1000 <= 75 ? 15 :
                                              timer_length / 60 / 1000 <= 90 ? 18 : 
                                              timer_length / 60 / 1000 <= 105 ? 21 : 24;
+                        // const cookiesBaked = timer_length / 60 / 1000 / 5;
                         document.getElementById("bakedGoods").innerHTML = `Cookies x${cookiesBaked}`;
                         updateCookies(cookiesBaked);
                         // Display image matching cookies baked

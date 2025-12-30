@@ -419,6 +419,8 @@
                     timer_mode = "focus";
                     updateDisplay(timer_length);
                     updateCountdownButton("start_timer");
+                    // Remove click-away listener
+                    document.removeEventListener("visibilitychange", clickAway);
                     // Reset cat animation to idle
                     clearInterval(bgImg);
                     bgImg = alternateImages(catImage, standingFrame1, standingFrame2);

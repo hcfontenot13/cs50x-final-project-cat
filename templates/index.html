@@ -382,19 +382,19 @@
                         const myModal = new bootstrap.Modal(timerCompleteModal);
                         myModal.show();
                         // Show # of cookies baked
-                        const cookiesBaked = timer_length / 60 / 1000 <= 15 ? 3 :
-                                             timer_length / 60 / 1000 <= 30 ? 6 :
-                                             timer_length / 60 / 1000 <= 45 ? 9 :
-                                             timer_length / 60 / 1000 <= 60 ? 12 :
-                                             timer_length / 60 / 1000 <= 75 ? 15 :
-                                             timer_length / 60 / 1000 <= 90 ? 18 : 
-                                             timer_length / 60 / 1000 <= 105 ? 21 : 24;
-                        // const cookiesBaked = timer_length / 60 / 1000 / 5;
+                        // const cookiesBaked = timer_length / 60 / 1000 <= 15 ? 3 :
+                        //                      timer_length / 60 / 1000 <= 30 ? 6 :
+                        //                      timer_length / 60 / 1000 <= 45 ? 9 :
+                        //                      timer_length / 60 / 1000 <= 60 ? 12 :
+                        //                      timer_length / 60 / 1000 <= 75 ? 15 :
+                        //                      timer_length / 60 / 1000 <= 90 ? 18 : 
+                        //                      timer_length / 60 / 1000 <= 105 ? 21 : 24;
+                        const cookiesBaked = timer_length / 60 / 1000 / 5;
                         document.getElementById("bakedGoods").innerHTML = `Cookies x${cookiesBaked}`;
                         updateCookies(cookiesBaked);
                         // Display image matching cookies baked
                         const cookieImage = document.getElementById("cookieImage");
-                        cookieImage.src = `static/images/cookie/cookie${cookiesBaked/3}.png`;
+                        cookieImage.src = `static/images/cookie/cookie${Math.ceil(cookiesBaked / 3)}.png`;
                         // Enable shop & info buttons
                         document.getElementById("shopButton").disabled = false;
                         document.getElementById("infoButton").disabled = false;
